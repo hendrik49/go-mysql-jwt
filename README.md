@@ -4,16 +4,11 @@ A guide for creating RESTful API with Golang and MySQL, JWT, and Gin.
 Create a Database called godb
 then run
 
-  $ ./migrate
+  $ go run migrate.go
 
 to Person table to be created
 
-then run
-	go get "github.com/gin-gonic/gin"
-	go get "github.com/go-sql-driver/mysql"	
-	go get "github.com/appleboy/gin-jwt"
-
-Run the main go file and your API server will be up and running
+then the main.go file and your API server will be up and running
 
   $ go run main.go
 
