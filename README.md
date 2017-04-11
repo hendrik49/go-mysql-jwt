@@ -1,7 +1,7 @@
 # go-mysql-rest-api
-A guide for creating RESTful API with Golang and MySQL and Gin.
+A guide for creating RESTful API with Golang and MySQL, JWT, and Gin.
 
-Create a Database called Gotest
+Create a Database called godb
 then run
 
   $ ./migrate
