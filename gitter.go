@@ -11,7 +11,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"	
 	"github.com/appleboy/gin-jwt"
 )
-var mySigningKey = []byte("didok49")
 
 type Person struct {
 	ID         int
