@@ -18,6 +18,13 @@ type Person struct {
 	LastName  string
 }
 
+type User struct {
+	ID         int
+	userName string
+	password  string
+	createdAt string
+}
+
 func personHandler(c *gin.Context) {
 
 	db, err := sql.Open("mysql", "root:password@tcp(127.0.0.1:3306)/godb")
@@ -50,6 +57,86 @@ func personHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"result": persons,
 		"count":  len(persons),
+	})
+}
+
+func usersHandler(c *gin.Context) {
+
+	db, err := sql.Open("mysql", "root:password@tcp(127.0.0.1:3306)/godb")
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+	defer db.Close()
+	// make sure connection is available
+	err = db.Ping()
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+
+	var (
+		user  User
+		users []User
+	)
+	rows, err := db.Query("select id, username from users;")
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+	for rows.Next() {
+		err = rows.Scan(&user.ID, &user.userName)
+		users = append(users, user)
+		if err != nil {
+			fmt.Print(err.Error())
+		}
+	}
+	defer rows.Close()
+	c.JSON(http.StatusOK, gin.H{
+		"result": users,
+		"count":  len(users),
+	})
+}
+
+
+func usersaveHandler(c *gin.Context) {	
+		var buffer bytes.Buffer
+		db, err := sql.Open("mysql", "root:password@tcp(127.0.0.1:3306)/godb")
+		if err != nil {
+			fmt.Print(err.Error())
+		}
+		defer db.Close()
+		// make sure connection is available
+		err = db.Ping()
+		if err != nil {
+			fmt.Print(err.Error())
+		}
+
+		username := c.PostForm("username")
+		password := c.PostForm("password")
+		stmt, err := db.Prepare("insert into users (username, password) values(?,?);")
+		if err != nil {
+			fmt.Print(err.Error())
+		}
+		_, err = stmt.Exec(username, password)
+
+		if err != nil {
+			fmt.Print(err.Error())
+		}
+
+		// Fastest way to append strings
+		buffer.WriteString(username)
+		buffer.WriteString(" ")
+		buffer.WriteString(password)
+		defer stmt.Close()
+		name := buffer.String()
+		c.JSON(http.StatusOK, gin.H{
+			"message": fmt.Sprintf(" %s successfully", name),
+		})
+	}
+
+
+func welcome(c *gin.Context){
+
+		c.JSON(http.StatusOK, gin.H{
+		"result": "Welcome to Goolang API",
 	})
 }
 
@@ -229,6 +316,9 @@ func main() {
 	}
 
 	router.POST("/login", authMiddleware.LoginHandler)
+	router.GET("/", welcome)
+	router.GET("/users", usersHandler)
+	router.POST("/user", usersaveHandler)
 
 	auth := router.Group("/auth")
 	auth.Use(authMiddleware.MiddlewareFunc())
